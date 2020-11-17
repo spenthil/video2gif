@@ -3,7 +3,6 @@
 
 # settings
 temp_dir="/tmp"
-output_dir="output"
 log_level="fatal"
 
 
@@ -58,7 +57,7 @@ Options:
     -l: max of width & height (default is 720, overridden by -w -h)
     -c: save the clip after converting
     -v: display & save the verbose ffmpeg logs
-    -o: output job_name (default is timestamp under 'output' folder) 
+    -o: output job_name (default is input_file with a '.gif' extension)
 
 Examples:
     $ video2gif.sh -a 1 -d 8 -r 90 -v input.wmv
@@ -196,8 +195,7 @@ palette_file="${temp_dir}/palette-${job_name}.png"
 if [[ -n "$opt_output_file" ]] ; then
     output_file="$opt_output_file"
 else
-    create_directory "$output_dir"
-    output_file="${output_dir}/${job_name}.gif"
+    output_file="${input_file%%.*}.gif"
 fi
 
 
@@ -283,6 +281,7 @@ eval ffmpeg "$flt_log" "$flt_seek" -i '"$input_file"' -vf '"${filters},${flt_pal
 # convert into gif
 [[ 1 -eq "$opt_verbose_log" ]] && export FFREPORT=file="${temp_dir}/ffmpeg-${job_name}-2gif.log"
 eval ffmpeg "$flt_log" "$flt_seek" -i '"$input_file"' -i '"$palette_file"' -lavfi '"${filters} [x]; [x][1:v] ${flt_paluse}"' -y '"$output_file"'
+rm -f '"$palette_file"'
 [[ $? -ne 0 ]] && {
    display_error "fail to convert input file \"${input_file}\" into gif in task \"${job_name}\"" 8
 }
