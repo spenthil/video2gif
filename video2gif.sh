@@ -9,7 +9,7 @@ log_level="fatal"
 # default arguments settings
 opt_fps=10
 opt_duration_sec=5
-opt_no_cutting=0
+opt_no_cutting=1
 opt_optimal_static=0
 opt_speed_times=1
 opt_rotate_times=0
@@ -45,9 +45,8 @@ Default:
     convert into GIF at 10 fps and its width & height won't exceed 720px.
 
 Options:
-    -a: position to start cutting (default: middle of the input)
-    -d: duration of the clip in seconds (default: 5)
-    -n: no cutting (override -a -d)
+    -a: position to start cutting (default: beginning)
+    -d: duration of the clip in seconds (default: 5, only applies if start position is specified)
     -f: frames per second (default: 10)
     -s: optimize for static background
     -t: speed up / slow down (default is x1.0)
@@ -117,13 +116,12 @@ while getopts ":a:d:nf:st:r:w:h:l:cvo:" opt; do
     case $opt in
         a)
             opt_start_time="${OPTARG}"
+	    opt_no_cutting=0
             ;;
         d)
             verify_number "${OPTARG}"
             opt_duration_sec="${OPTARG}"
-            ;;
-        n)
-            opt_no_cutting=1
+	    opt_no_cutting=0
             ;;
         f)
             verify_number "${OPTARG}"
